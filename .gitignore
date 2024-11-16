@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+data/
+saved_models/
+.pytest_cache/ 
