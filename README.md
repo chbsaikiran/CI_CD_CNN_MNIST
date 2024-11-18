@@ -9,7 +9,7 @@ pip install -r requirements.txt
 python train.py
 
 ## Run tests:
-pytest tests/
+pytest -v --capture=no tests/
 
 ## To push to GitHub:
 Create a new repository on GitHub
