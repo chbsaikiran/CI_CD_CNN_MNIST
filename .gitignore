@@ -1,5 +1,6 @@
 __pycache__/
 *.pyc
+*.png
 data/
 saved_models/
 .pytest_cache/ 
