@@ -243,3 +243,72 @@ def test_rotation_transformation():
     print(f"Model accuracy on rotated images: {accuracy:.2f}%")
     assert accuracy > 80, f"Accuracy on rotated images is {accuracy:.2f}%, should be > 80%"
     print("✓ PASSED: Model achieves required accuracy on rotated images")
+
+def test_scale_transformation():
+    """Test model performance on scaled images"""
+    print(f"\nTest 7: Scale Transformation Performance Check")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = SimpleCNN().to(device)
+    
+    # Load the latest model
+    model_files = glob.glob('saved_models/model_*.pth')
+    latest_model = max(model_files, key=os.path.getctime)
+    print(f"Loading model: {latest_model}")
+    model.load_state_dict(torch.load(latest_model))
+    
+    # Create transforms
+    base_transform = transforms.ToTensor()
+    
+    scale_transform = transforms.Compose([
+        transforms.RandomAffine(degrees=0, scale=(0.9, 1.1)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ])
+    
+    # Load test dataset
+    test_dataset = datasets.MNIST('data', train=False, download=True, transform=base_transform)
+    
+    # Visualize some examples
+    sample_images = []
+    scaled_images = []
+    
+    # Get 5 sample images
+    for i in range(5):
+        img_pil, _ = test_dataset.data[i], test_dataset.targets[i]
+        # Convert to PIL Image for visualization
+        img_pil = Image.fromarray(img_pil.numpy())
+        sample_images.append(base_transform(img_pil))
+        
+        # Apply scale transformation without normalization
+        scaled = transforms.Compose([
+            transforms.RandomAffine(degrees=0, scale=(0.9, 1.1)),
+            transforms.ToTensor()
+        ])(img_pil)
+        scaled_images.append(scaled)
+    
+    # Save visualization
+    visualize_transformations(sample_images, scaled_images, 
+                            "Original vs Scaled Images", 
+                            "scale_transformation_samples.png")
+    print("✓ Generated visualization of scaled images (saved as 'scale_transformation_samples.png')")
+    
+    # Test accuracy on scaled dataset
+    scaled_dataset = datasets.MNIST('data', train=False, download=True, transform=scale_transform)
+    scaled_loader = torch.utils.data.DataLoader(scaled_dataset, batch_size=1000)
+    
+    model.eval()
+    correct = 0
+    total = 0
+    
+    with torch.no_grad():
+        for data, target in scaled_loader:
+            data, target = data.to(device), target.to(device)
+            outputs = model(data)
+            _, predicted = torch.max(outputs.data, 1)
+            total += target.size(0)
+            correct += (predicted == target).sum().item()
+    
+    accuracy = 100 * correct / total
+    print(f"Model accuracy on scaled images: {accuracy:.2f}%")
+    assert accuracy > 80, f"Accuracy on scaled images is {accuracy:.2f}%, should be > 80%"
+    print("✓ PASSED: Model achieves required accuracy on scaled images")

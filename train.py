@@ -9,7 +9,7 @@ from torch.utils.data import ConcatDataset
 import random
 import numpy as np
 
-def create_augmented_dataset(original_dataset, num_augmented=0.05):
+def create_augmented_dataset(original_dataset, num_augmented=0.15):
     # Calculate how many augmented samples to create (5% of original)
     num_samples = int(len(original_dataset) * num_augmented)
     
@@ -26,21 +26,31 @@ def create_augmented_dataset(original_dataset, num_augmented=0.05):
         transforms.Normalize((0.1307,), (0.3081,))
     ])
     
+    scale_transform = transforms.Compose([
+        transforms.RandomAffine(degrees=0, scale=(0.9, 1.1)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ])
+    
     # Create augmented datasets
     shear_dataset = datasets.MNIST('data', train=original_dataset.train, 
                                  download=True, transform=shear_transform)
     rotation_dataset = datasets.MNIST('data', train=original_dataset.train, 
                                     download=True, transform=rotation_transform)
+    scale_dataset = datasets.MNIST('data', train=original_dataset.train,
+                                 download=True, transform=scale_transform)
     
     # Randomly select indices for augmented samples
     indices = random.sample(range(len(original_dataset)), num_samples)
     
     # Create subset datasets
-    shear_subset = torch.utils.data.Subset(shear_dataset, indices[:num_samples//2])
-    rotation_subset = torch.utils.data.Subset(rotation_dataset, indices[num_samples//2:])
+    samples_per_transform = num_samples // 3
+    shear_subset = torch.utils.data.Subset(shear_dataset, indices[:samples_per_transform])
+    rotation_subset = torch.utils.data.Subset(rotation_dataset, indices[samples_per_transform:2*samples_per_transform])
+    scale_subset = torch.utils.data.Subset(scale_dataset, indices[2*samples_per_transform:])
     
     # Combine original and augmented datasets
-    combined_dataset = ConcatDataset([original_dataset, shear_subset, rotation_subset])
+    combined_dataset = ConcatDataset([original_dataset, shear_subset, rotation_subset, scale_subset])
     
     return combined_dataset
 
