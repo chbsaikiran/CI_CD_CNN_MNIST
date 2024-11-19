@@ -287,8 +287,8 @@ def test_data_integrity():
     
     for img, name in [(sheared, "Sheared"), (rotated, "Rotated"), (scaled, "Scaled")]:
         img_np = img.squeeze().numpy()
-        similarity = ssim(original_np, img_np)
-        assert similarity > 0.3, f"{name} image has SSIM {similarity}, should be > 0.5"
+        similarity = ssim(original_np, img_np, data_range=1.0)
+        assert similarity > 0.3, f"{name} image has SSIM {similarity}, should be > 0.3"
         print(f"{name} image SSIM: {similarity:.3f}")
     
     print("✓ PASSED: All augmented images maintain reasonable similarity to originals")
@@ -353,7 +353,7 @@ def test_augmentation_diversity():
             for j in range(i + 1, n_versions):
                 img1 = versions[i].squeeze().numpy()
                 img2 = versions[j].squeeze().numpy()
-                similarity = ssim(img1, img2)
+                similarity = ssim(img1, img2, data_range=1.0)
                 similarities.append(similarity)
         
         avg_similarity = np.mean(similarities)
