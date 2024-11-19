@@ -1,3 +1,5 @@
+[![ML Pipeline](https://github.com/chbsaikiran/CI_CD_CNN_MNIST/actions/workflows/ml-pipeline.yml/badge.svg)](https://github.com/chbsaikiran/CI_CD_CNN_MNIST/actions/workflows/ml-pipeline.yml)
+
 ## Create a virtual environment and activate it:
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
