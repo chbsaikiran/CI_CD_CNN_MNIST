@@ -36,3 +36,15 @@ git push -u origin main
 2. Input shape compatibility (28x28)
 3. Output shape (10 classes)
 4. Model accuracy (> 95%)
+
+
+
+## Three additional tests after using augmented data
+1. test_combined_transformations:
+This test evaluates the model's accuracy when subjected to combined transformations (shear, rotation, and scale). It creates a dataset with equal proportions of images transformed by these techniques, checks the model's performance, and ensures that the accuracy exceeds 90%. It also visualizes the transformations for analysis.
+
+2. test_data_integrity:
+This test ensures that the transformations (shear, rotation, scale) preserve the structural integrity of the images. It validates image dimensions, pixel value ranges, and similarity (SSIM) between the original and transformed images to ensure the augmentations do not distort data beyond acceptable limits.
+
+3. test_augmentation_diversity:
+This test checks if the augmentations produce diverse variations of images. It measures pixel variance across multiple versions of augmented images and structural similarity (SSIM) between them, ensuring that each transformation introduces sufficient variety without being overly repetitive. It also provides a visual comparison of the diversity.
